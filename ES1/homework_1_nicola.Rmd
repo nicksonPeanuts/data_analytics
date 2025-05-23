@@ -1,0 +1,148 @@
+
+---
+title: "Homework 1"
+author: "Nicola Pinat"
+date: "2025-04-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Esercizio 1
+
+```{r}
+print(seq(from=20, to=50))
+print(seq(from=20, to=50, length=3000))
+
+sum <- sum(seq(from=20, to=50, length=3000))
+mean <- mean(seq(from=20, to=50, length=3000))
+```
+
+# Esercizio 2
+
+```{r}
+fib <- function(n){
+    sum <- 0
+    a <- 0
+    b <- 1
+    print(sum)
+    print(a)
+    valoriFib <- c(a,b)
+    
+    for(i in 1:n){
+      sum <- a + b
+      a <- b
+      b <- sum
+      valoriFib <- c(valoriFib, sum)
+      print(sum)
+    }
+
+    cat("media: ", mean(valoriFib), "\n")
+    cat("somma: ", sum(valoriFib), "\n")
+}
+
+fibonacci <- fib(10)
+```
+
+# Esercizio 3
+
+```{r}
+x1 <- runif(10, min = 0, max = 10)
+x2 <- matrix(1:10, ncol = 3, nrow = 3)
+x3 <- c("Nicola", "Silvestro", "Rodolfo")
+
+lista <- list(x1,x2,x3)
+names(lista) <- c("Numeri", "Matrice", "Cantanti")
+str(lista)
+```
+
+# Esercizio 4
+
+```{r}
+dati <- read.csv("Life.csv")
+dati$value[dati$value == 9999] <- NA
+dati <- dati[-1,]
+
+dati$country_name <- factor(dati$country_name)
+dati$year <- factor(dati$year)
+
+media_australia <- mean(dati[dati$country_code == "AUT", ]$value)
+medie_generali <- tapply(dati$value, dati$country_name, mean, na.rm=TRUE)
+barplot(sort(medie_generali))
+```
+
+# Esercizio 5
+
+```{r}
+vettore <- seq(from = 2, to = 12, by = 2)
+matrice <- matrix(vettore, ncol = 3, nrow=2)
+is.matrix(matrice)
+is.array(matrice)
+
+b <- matrice[,3]
+str(b)
+
+matrix(b)
+```
+
+# Esercizio 6
+
+```{r}
+nazioni <- read.csv("nazioni.csv")
+
+apply(is.na(nazioni), 2, sum)
+colSums(is.na(nazioni))
+
+righe_na <- apply(nazioni, 1, function(x) any(is.na(x)))
+paesi_na <- nazioni$nome[righe_na]
+print(unique(paesi_na))
+
+nazioni <- na.omit(nazioni)
+
+freq_area <- prop.table(table(nazioni$areaGeo)) * 100
+freq_area_sorted <- sort(freq_area, decreasing = TRUE)
+print(freq_area_sorted)
+
+ordered_levels <- names(freq_area_sorted)
+nazioni$areaGeofact <- factor(nazioni$areaGeo, levels = ordered_levels, ordered = TRUE)
+nazioni$areaGeo <- NULL
+
+nazioni$oil <- factor(nazioni$oil, levels= c(1, 2), labels=c("no", "yes"))
+
+paesi_esportatori <- nazioni[nazioni$oil == "yes", c("nome", "areaGeofact")]
+print(paesi_esportatori)
+
+tapply(nazioni$infmort, nazioni$areaGeofact, mean, na.rm = TRUE)
+
+sum(nazioni$infmort >= 300)
+nazioni_interessate <- nazioni[nazioni$infmort >= 300, ]
+nrow(nazioni_interessate[nazioni_interessate$oil == "yes", ])
+
+y_range <- range(nazioni$infmort, na.rm=TRUE)
+par(mfrow = c(2,2))
+
+america <- nazioni$infmort[nazioni$areaGeofact == "Americas"]
+africa  <- nazioni$infmort[nazioni$areaGeofact == "Africa"]
+europa  <- nazioni$infmort[nazioni$areaGeofact == "Europe"]
+asia    <- nazioni$infmort[nazioni$areaGeofact == "Asia"]
+
+boxplot(america, horizontal=FALSE, main="Area: Americas", ylim = y_range)
+boxplot(africa,  horizontal=FALSE, main="Area: Africa", ylim = y_range)
+boxplot(europa,  horizontal=FALSE, main="Area: Europe", ylim = y_range)
+boxplot(asia,    horizontal=FALSE, main="Area: Asia", ylim = y_range)
+
+par(mfrow = c(1,1))
+hist(nazioni$reddito, main= "", xlab="Reddito pro capite")
+
+mediane <- tapply(nazioni$reddito, nazioni$areaGeofact, median, na.rm=TRUE)
+points(x = mediane, y = rep(5, length(mediane)), col = rainbow(length(mediane)), pch = 19, cex = 1.5)
+
+redditoCat <- cut(nazioni$reddito, breaks= c(-Inf,500,1500, 4000, Inf),
+                  labels=c("(0-500]", "(500-1500]", "(1500,4000]", "più di 4000"))
+
+sum(redditoCat == "più di 4000", na.rm = TRUE)
+tabella <- prop.table(table(redditoCat, nazioni$oil), margin = 2)
+round(tabella * 100, 2)
+```
