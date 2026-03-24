@@ -1,34 +1,65 @@
-# Caricamento
+
+---
+title: "Analisi Regressione Multipla - Earnings"
+author: "Nicola Pinat"
+date: "2025-06-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Caricamento dataset
+
+```{r}
+# Caricamento dei dati
 earnings <- read.csv("earnings.csv")
+```
 
 # Pulizia: rimuove outlier su earn
-earnings <- subset(earnings, earn <= 150000)
 
+```{r}
+earnings <- subset(earnings, earn <= 150000)
+```
 
 # Elimina codici 99 non validi da education dei genitori
+
+```{r}
 earnings$mother_education[earnings$mother_education > 18] <- NA
 earnings$father_education[earnings$father_education > 18] <- NA
+```
 
 # Variabili per il modello completo
-model_vars <- c("earn", "height", "weight", "male", "education", "mother_education", "father_education", "walk", 
+
+```{r}
+model_vars <- c("earn", "height", "weight", "male", "education",
+                "mother_education", "father_education", "walk",
                 "exercise", "smokenow", "tense", "angry", "age")
+```
 
 # Rimozione dei NA
+
+```{r}
 dati_model <- na.omit(earnings[ , model_vars])
+```
 
 # Modello completo
+
+```{r}
 model_completo <- lm(earn ~ height + weight + male + education +
-                       mother_education + father_education + walk + 
+                       mother_education + father_education + walk +
                        exercise + smokenow + tense + angry + age,
                      data = dati_model)
-
 summary(model_completo)
+```
 
-# ====== MODELLO ======
+# MODELLO
 # Manteniamo solo variabili significative:
 # (education, male, age, height)
 
+```{r}
 model_parsimonioso <- lm(earn ~ education + male + age + height,
                          data = dati_model)
-
 summary(model_parsimonioso)
+```

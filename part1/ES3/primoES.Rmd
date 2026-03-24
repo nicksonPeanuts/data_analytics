@@ -1,0 +1,77 @@
+Chiaro Nicola: l’errore ti dice che hai usato **troppe backtick (\`\`\`\` invece di \`\`\`) per chiudere un blocco di codice**.
+
+Ti metto qui sotto il file `.Rmd` **corretto** con **tutti i blocchi di codice chiusi correttamente**:
+
+---
+
+````markdown
+---
+title: "PrimoEs"
+author: "Nicola Pinat"
+date: "2025-06-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+````
+
+## Caricamento e preparazione dei dati
+
+```{r}
+library(cluster)
+library(cluster.datasets)
+
+# Caricamento dataset
+data("UNLifeExpectancy", package = "cluster.datasets")
+datiUN <- UNLifeExpectancy
+
+# Verifica NA totali
+sum(is.na(datiUN))
+
+# Percentuale di NA per colonna
+colMeans(is.na(datiUN)) * 100
+
+# Imputazione media per colonne con molti NA
+datiUN$SMOKING[is.na(datiUN$SMOKING)] <- mean(datiUN$SMOKING, na.rm = TRUE)
+datiUN$FEMALEBOSS[is.na(datiUN$FEMALEBOSS)] <- mean(datiUN$FEMALEBOSS, na.rm = TRUE)
+datiUN$RESEARCHERS[is.na(datiUN$RESEARCHERS)] <- mean(datiUN$RESEARCHERS, na.rm = TRUE)
+datiUN$PUBLICEDUCATION[is.na(datiUN$PUBLICEDUCATION)] <- mean(datiUN$PUBLICEDUCATION, na.rm = TRUE)
+datiUN$PRIVATEHEALTH[is.na(datiUN$PRIVATEHEALTH)] <- mean(datiUN$PRIVATEHEALTH, na.rm = TRUE)
+```
+
+## Standardizzazione dei dati numerici
+
+```{r}
+dati_numerici <- datiUN[sapply(datiUN, is.numeric)]
+dati_std <- scale(dati_numerici)
+dati_std[is.na(dati_std)] <- 0
+```
+
+## Clustering con PAM
+
+```{r}
+pam.out <- pam(dati_std, k = 2, metric = "euclidean")
+pam.out
+```
+
+## Visualizzazione Clustering
+
+```{r}
+plot(datiUN, col = (pam.out$cluster + 1), main = "PAM K=2", pch = 19)
+```
+
+## Silhouette Plot
+
+```{r}
+plot(pam.out, which = 2, main = "Silhouette Plot PAM")
+```
+
+```
+
+---
+
+✅ Ora non ci sono backtick sbagliati: salva questo come `primoES.Rmd` e premi **Knit**.
+
+Se vuoi posso anche generarti subito il `.Rmd` già pronto come file. Vuoi?
+```
