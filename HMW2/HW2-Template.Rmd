@@ -1,0 +1,201 @@
+---
+title: "Data Analytics - Homework 2"
+author: Il vostro nome 
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: false
+    toc_float: false
+    toc_depth: 3
+    theme: flatly
+    highlight: kate
+    number_sections: false
+    df_print: paged
+    code_folding: show
+  pdf_document:
+    toc: true
+    number_sections: true
+    highlight: kate
+editor_options: 
+  chunk_output_type: inline
+---
+
+# Soluzioni
+
+## Esercizio 1
+
+Caricamento dati ed eliminazione valori mancanti
+
+```{r}
+nazioni <- read.csv("nazioni.csv")
+insurance <- read.csv("insurance.csv")
+```
+
+*gestione valori mancanti*
+
+```{r}
+
+sum(is.na(nazioni))
+sum(is.na(insurance))
+
+# il dataset nazioni ha 7 valori mancanti, facciamo imputazione con la media della categoria/e contenente i dati
+
+
+t <-lapply(nazioni, is.na)
+lapply(t, sum)
+
+
+```
+
+**Punto a.** Per le variabili presenti nel dataset, si specifichi se si tratta di variabili qualitative sconnesse, ordinali o quantitative discrete, motivando la risposta.
+
+- `areaGeo`:
+- `reddito`:
+- `infmort`:
+- `oil`:
+
+**Punto b.** Per la variabile `reddito`, identifica quali nazioni sono considerate "outlier" (valori anomali) secondo il metodo del boxplot.
+
+```{r}
+
+```
+
+Risposta:
+
+**Punto c.** Rappresentare con un istogramma la distribuzione del reddito. Modificare l'etichetta dell'asse x con il nome della variabile ed eliminare il titolo. Quindi aggiungere al grafico la linea di densità stimata con il metodo del nucleo. Infine, aggiungere al grafico le mediane del reddito per area geografica utilizzando dei punti di forma e colore diverso.
+
+```{r}
+
+```
+
+Risposta:
+
+**Punto d.** Si calcolino media, media troncata, e mediana del `reddito`. Confrontando media e mediana, cosa puoi dedurre sull'asimmetria della distribuzione del `reddito`? Quindi, calcola l'indice di asimmetria (skewness) per `reddito`. La distribuzione è asimmetrica a destra o a sinistra? Questa informazione emerge chiaramente analizzando l'istogramma o la curva di densità stimata con il metodo del nucleo?
+
+```{r}
+
+```
+
+Risposta:
+
+**Punto e.** Applica una trasformazione logaritmica alla variabile `reddito` ed aggiungi la nuova variabile al data frame. Confronta l'istogramma del reddito "originale" con quello del log(`reddito`). Calcola nuovamente l'indice di skewness sul reddito trasformato. La trasformazione ha aiutato a rendere la distribuzione più simmetrica?
+
+```{r}
+
+```
+
+Risposta:
+
+**Punto f.** Si effettui un confronto sulla dispersione di `reddito` per area geografica mediante almeno due indici di dispersione. Quale area geografica presenta una maggiore variabilità?
+
+```{r}
+
+```
+
+Risposta:
+
+**Punto g.** Si rappresenti in un unico grafico le funzioni di ripartizione empiriche (ecdf) del reddito per i paesi appartenenti alle quattro area geografica. Usa colori diversi e una legenda. Osservando il grafico, quale area geografica ha una percentuale maggiore di nazioni con un reddito inferiore ai 5.000 dollari?
+
+```{r}
+
+```
+
+Risposta:
+
+**Punto h.** Dividere la finestra grafica in 2 righe e 2 colonne. In ogni spazio, rappresentare con un boxplot la distribuzione di `infmort` condizionata alla regione geografica. Impostare lo stesso range sull'asse y ed il titolo del grafico. Infine, dopo aver ripristinato la finestra grafica a 1x1, si ottenga il boxplot della distribuzione della mortalità infantile condizionata alla regione geografica con un unico comando. Si commentino i risultati.
+
+```{r}
+
+```
+
+Commenti:
+
+**Punto i.** Utilizzando il pacchetto `lattice` si visualizzi la densità della mortalità infantile condizionata all'area geografica. Commentare le diverse forme delle densità.
+
+```{r}
+
+```
+
+Risposta:
+
+**Punto l.** Dopo aver aggiunto al dataframe la variabile `redditoCat`, che riporta la divisione della variabile reddito in classi utilizzando i quartili, si stampino le distribuzioni condizionate della variabile redditoCat rispetto all'esportazione di petrolio approssimandole a 2 cifre decimali. Quindi si ottenga una opportuna rappresentazione grafica delle distribuzioni condizionate e commentare.
+
+```{r}
+
+```
+
+Risposta:
+
+## Esercizio 2
+
+Il dataset `insurance.csv` descrive le spese mediche sostenute da una compagnia assicurativa statunitense per 1338 soggetti. Le variabili presenti nel dataset sono:
+
+- `age`: età dell’assicurato
+- `sex`: genere dell’assicurato
+- `bmi`: indice di massa corporea
+- `children`: numero di figli a carico
+- `smoker`: fumatore
+- `region`: l’area di residenza dell’assicurato negli Stati Uniti
+- `charges`: le spese mediche individuali fatturate dall’assicurazione
+
+**Punto a.** Rappresentare graficamente la distribuzione delle variabili categoriali evidenziando con un colore diverso nel grafico la categoria maggiormente presente.
+
+```{r}
+
+```
+
+Risposta:
+
+**Punto b.** In un unico grafico, ottenere i boxplot condizionati della variabile `charges` rispetto alla variabile `children` considerando le seguenti categorie: 0, 1, 2, 3+. Aggiungere su ciascun boxplot la media condizionata utilizzando una barra rossa, parallela alla mediana, della stessa larghezza del boxplot.
+
+```{r}
+
+```
+
+Risposta:
+
+**Punto c.** A partire dalla variabile `bmi`, aggiungere al data frame una nuova variabile `bmicat` utilizzando le categorie: `underweight` = \<18.5, `normal` = 18.50 – 24.99, `overweight` = ≥ 25, `obese` = ≥ 30. Rappresentare gli istogrammi delle spese mediche rispetto alle categorie della variabile `bmicat` utilizzando gli stessi intervalli sugli assi. Sovrapporre agli istogrammi le curve di densità condizionate stimate con il metodo del nucleo e aggiungere la legenda.
+
+```{r}
+
+```
+
+Risposta:
+
+**Punto d.** Produrre dei grafici per esplorare la relazione tra le variabili `bmicat` e `sex`. Cosa possiamo dire riguardo all'associazione tra le due variabili?
+
+```{r}
+
+```
+
+Risposta:
+
+## Esercizio 3
+
+I dati riportati nel file `ScolarizzazioneRistorazione.txt` sono tratti da un'indagine e riguardano il luogo dove viene consumato il pranzo (`Luogo Pasto`) rispetto al titolo di studio (`Titolo Studio`) dagli italiani con più di 21 anni. I valori sono riportati in migliaia.
+
+Si analizzi il fenomeno costruendo opportune tabelle di frequenza e rappresentazioni grafiche, in particolare:
+
+**Punto a.** Si ottengano le frequenze marginali (assolute e relative) di `Titolo Studio` e `Luogo Pasto` e le si rappresenti graficamente sia mediante diagramma a barre che a torta. Si commentino i risultati.
+
+```{r}
+
+```
+
+Risposta:
+
+**Punto b.** Si ottenga la distribuzione di `Luogo Pasto` condizionata a titolo di studio. Si commentino i risultati.
+
+```{r}
+
+```
+
+Risposta:
+
+**Punto c.** Si rappresentino mediante diagrammi a barre le distribuzioni condizionate al punto .b e si includa la distribuzione marginale opportuna. Dall'analisi dei grafici possiamo dire se vi sia un sospetto di associazione tra le due variabili? Commentare.
+
+```{r}
+
+```
+
+Risposta:
