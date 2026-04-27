@@ -1,6 +1,6 @@
 ---
 title: "Data Analytics - Homework 2"
-author: Il vostro nome 
+author: Nicola Pinat 
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -44,19 +44,38 @@ sum(is.na(insurance))
 t <-lapply(nazioni, is.na)
 lapply(t, sum)
 
+# ora che sappiamo quali contengono dati mancanti, facciamo pulizia
+
+nazioni <- na.omit(nazioni)
+
+
+any(is.na(nazioni))
+
+summary(nazioni)
+
 
 ```
 
-**Punto a.** Per le variabili presenti nel dataset, si specifichi se si tratta di variabili qualitative sconnesse, ordinali o quantitative discrete, motivando la risposta.
+  **Punto a.** Per le variabili presenti nel dataset, si specifichi se si tratta di variabili qualitative sconnesse, ordinali o quantitative discrete, motivando la risposta.
 
-- `areaGeo`:
-- `reddito`:
-- `infmort`:
-- `oil`:
+- `areaGeo`: varibile qualitativa sconnessa, non c'è una gerarchia in questo caso
+- `reddito`: variabile quantitativa discreta
+- `infmort`: variabile quantitativa discreta, come per reddito, è numerica e rappresenta una                 quantità in esame
+- `oil`:  variabile categoriale che abbiamo convertito in fattore, potremmo considerarla qualitativa sconnessa
 
 **Punto b.** Per la variabile `reddito`, identifica quali nazioni sono considerate "outlier" (valori anomali) secondo il metodo del boxplot.
 
 ```{r}
+
+# plotting semplice
+box <- boxplot(nazioni$reddito, col="lightblue", horizontal=TRUE)
+
+min(box$out)
+
+nazioni_out <- nazioni$nome[nazioni$reddito > min(box$out)]
+
+nazioni_out
+
 
 ```
 
@@ -66,6 +85,29 @@ Risposta:
 
 ```{r}
 
+hist(nazioni$reddito, freq=FALSE, main = "", xlab = "reddito", ylab="densità", border = "white")
+
+lines(density(nazioni$reddito, na.rm=TRUE), col = "darkblue", lwd=2)
+
+# aggiunta mediane del reddito
+
+
+
+
+mediane_per_area <- tapply(nazioni$reddito, nazioni$areaGeo, mean)
+mediane_per_area
+
+abline(v=mediane_per_area["Africa"], col = "yellow", lty=1)
+
+abline(v=mediane_per_area["Asia"], col = "brown", lty = 2)
+
+abline(v=mediane_per_area["Europe"], col = "Blue", lty = 3)
+
+abline(v=mediane_per_area["Americas"], col = "Red", lty = 4)
+
+```
+```{r}
+boxplot(reddito ~ areaGeo, data=nazioni, col=rainbow(4), main="Reddito per Area")
 ```
 
 Risposta:
@@ -74,57 +116,157 @@ Risposta:
 
 ```{r}
 
+
+media <- mean(nazioni$reddito)
+media_troncata <- mean(nazioni$reddito, trim = 0.1)
+mediana <- median(nazioni$reddito)
+
+media
+mediana
+
+media-mediana
+
+# calcoliamo l'indice di skewness
+
+library("moments")
+sk <- skewness(nazioni$reddito)
+
+
+
+
 ```
 
-Risposta:
+Risposta: La media è più grande di +656, indicando una asimmetria dei dati verso sinistra confermata dal calcolo dell'indice di asimmetria. Dall'istogramma si evincono le stesse caratteristiche
 
 **Punto e.** Applica una trasformazione logaritmica alla variabile `reddito` ed aggiungi la nuova variabile al data frame. Confronta l'istogramma del reddito "originale" con quello del log(`reddito`). Calcola nuovamente l'indice di skewness sul reddito trasformato. La trasformazione ha aiutato a rendere la distribuzione più simmetrica?
 
 ```{r}
 
+logreddito <- log(nazioni$reddito)
+nazioni$logreddito <- logreddito
+
+par(mfrow = c(1,2))
+
+hist(nazioni$reddito, freq=FALSE, main = "", xlab = "reddito", ylab="densità", border = "white")
+hist(nazioni$logreddito, freq=FALSE, main = "", xlab = "logreddito", ylab="densità", border = "white")
+sk <- skewness(nazioni$logreddito)
+
+sk
+
 ```
 
-Risposta:
+Risposta: Si, dalla visualizzazione del grafico e dal calcolo della skewness, abbiamo conferma che siamo riusciti a rendere i dati meno asimmetrici
 
 **Punto f.** Si effettui un confronto sulla dispersione di `reddito` per area geografica mediante almeno due indici di dispersione. Quale area geografica presenta una maggiore variabilità?
 
 ```{r}
 
+varianza <- tapply(nazioni$reddito, nazioni$areaGeo, sd)
+
+mad <- tapply(nazioni$reddito, nazioni$areaGeo, mad)
+
+varianza
+mad
+
 ```
 
-Risposta:
+Risposta: L'analisi mediante varianza e mediante mad ci portano a concludere che i paesi con maggior dispersione di reddito sono: Europe e Americas. Un'indagine con mad ci porta a verificare la presenza di molti outlier per africa americas e asia, come confermato dai boxplot sopra
 
 **Punto g.** Si rappresenti in un unico grafico le funzioni di ripartizione empiriche (ecdf) del reddito per i paesi appartenenti alle quattro area geografica. Usa colori diversi e una legenda. Osservando il grafico, quale area geografica ha una percentuale maggiore di nazioni con un reddito inferiore ai 5.000 dollari?
 
 ```{r}
 
+par(mfrow = c(1,1))
+
+europa <- nazioni$reddito[nazioni$areaGeo == "Europe"]
+asia <- nazioni$reddito[nazioni$areaGeo == "Asia"]
+americas <- nazioni$reddito[nazioni$areaGeo == "Americas"]
+africa <- nazioni$reddito[nazioni$areaGeo == "Africa"]
+
+
+plot(ecdf(europa), main = "funzione di ripartizione", xlab = "reddito")
+lines(ecdf(asia), col = "red")
+lines(ecdf(americas), col = "blue")
+lines(ecdf(africa), col = "purple")
+
+
 ```
 
-Risposta:
+Risposta: Tutte quelle che non sono Europe
 
 **Punto h.** Dividere la finestra grafica in 2 righe e 2 colonne. In ogni spazio, rappresentare con un boxplot la distribuzione di `infmort` condizionata alla regione geografica. Impostare lo stesso range sull'asse y ed il titolo del grafico. Infine, dopo aver ripristinato la finestra grafica a 1x1, si ottenga il boxplot della distribuzione della mortalità infantile condizionata alla regione geografica con un unico comando. Si commentino i risultati.
 
 ```{r}
 
+par(mfrow = c(2,2))
+
+infmortEurope <- nazioni$infmort[nazioni$areaGeo == "Europe"]
+infmortAsia <- nazioni$infmort[nazioni$areaGeo == "Asia"]
+infmortAfrica <- nazioni$infmort[nazioni$areaGeo == "Africa"]
+infmortAmericas <- nazioni$infmort[nazioni$areaGeo == "Americas"]
+
+globalrange <- range(nazioni$reddito)
+
+boxplot(infmortEurope, main = "Europe", horizontal = TRUE, ylim = globalrange)
+boxplot(infmortAsia, main = "Asia", horizontal = TRUE, ylim = globalrange)
+boxplot(infmortAfrica, main = "Africa", horizontal = TRUE, ylim = globalrange)
+boxplot(infmortAmericas, main = "Americas", horizontal = TRUE, ylim = globalrange)
+
 ```
 
-Commenti:
+```{r}
+
+par(mfrow = c(1,1))
+
+boxplot(infmort ~ areaGeo, data = nazioni)
+
+
+```
+
+
+
+Commenti: Sembra esserci una correlazione fra la mortalità infantile e il reddito dopo la visualizzazione di questo grafico
 
 **Punto i.** Utilizzando il pacchetto `lattice` si visualizzi la densità della mortalità infantile condizionata all'area geografica. Commentare le diverse forme delle densità.
 
 ```{r}
+library(lattice)
 
+densityplot(~ infmort | areaGeo, data = nazioni)
 ```
 
-Risposta:
+Risposta: Notiamo come in europa e nelle americhe abbiamo una densità molto meno dispersa rispetto ad asia e africa,
+tutto confermato rispetto a quanto visto nei grafici precedenti.
 
 **Punto l.** Dopo aver aggiunto al dataframe la variabile `redditoCat`, che riporta la divisione della variabile reddito in classi utilizzando i quartili, si stampino le distribuzioni condizionate della variabile redditoCat rispetto all'esportazione di petrolio approssimandole a 2 cifre decimali. Quindi si ottenga una opportuna rappresentazione grafica delle distribuzioni condizionate e commentare.
 
 ```{r}
 
+q <- quantile(nazioni$reddito, probs = seq(0, 1, 0.25), na.rm = TRUE)
+
+nazioni$redditoCat <- cut(nazioni$reddito, breaks = q, include.lowest = TRUE, labels = c("Basso", "Medio-Basso", "Medio-Alto", "Alto"))
+
+# Creiamo la tabella di contingenza
+tab <- table(nazioni$redditoCat, nazioni$oil)
+
+dist_condizionata <- round(prop.table(tab, margin = 2), 2)
+
+print(dist_condizionata)
+
+
+barplot(dist_condizionata, 
+        beside = TRUE,
+        col = c("red", "orange", "blue", "darkgreen"),
+        main = "Distribuzione Reddito condizionata a Oil",
+        xlab = "Esportatore di Petrolio",
+        ylab = "Frequenza Relativa",
+        legend.text = rownames(dist_condizionata),
+        args.legend = list(x = "topright", bty = "n"))
+
+
 ```
 
-Risposta:
+Risposta: In questo caso vediamo che l'esportazione di petrolio provoca un aumento del reddito generale di un paese, è quindi più probabile trovarsi nella fascia alta se si esporta che non altrimenti
 
 ## Esercizio 2
 
@@ -141,6 +283,37 @@ Il dataset `insurance.csv` descrive le spese mediche sostenute da una compagnia 
 **Punto a.** Rappresentare graficamente la distribuzione delle variabili categoriali evidenziando con un colore diverso nel grafico la categoria maggiormente presente.
 
 ```{r}
+insurance <- read.csv("insurance.csv")
+# Supponiamo che il dataset sia già caricato come 'insurance'
+# insurance <- read.csv("insurance.csv")
+
+# Definiamo le variabili categoriali da analizzare
+variabili_cat <- c("sex", "smoker", "region")
+
+# Impostiamo il layout per vedere i grafici insieme
+par(mfrow=c(1,3))
+
+for (var in variabili_cat) {
+  # 1. Creiamo la tabella delle frequenze
+  tabella <- table(insurance[[var]])
+  
+  # 2. Identifichiamo qual è il valore massimo
+  max_val <- max(tabella)
+  
+  # 3. Creiamo un vettore di colori: grigio per tutti, rosso per il massimo
+  colori <- ifelse(tabella == max_val, "firebrick", "lightgrey")
+  
+  # 4. Rappresentazione grafica
+  barplot(tabella, 
+          col = colori, 
+          main = paste("Distribuzione di", var),
+          ylab = "Frequenza",
+          border = "white")
+}
+
+# Ripristiniamo il layout singolo
+par(mfrow=c(1,1))
+
 
 ```
 
